@@ -5,13 +5,13 @@
         <link>http://example.com</link>
         <description>Personal Learning Blog</description>
         <language>zh-HK</language>
-        <pubDate>Mon, 07 Nov 2022 15:50:46 +0800</pubDate>
-        <lastBuildDate>Mon, 07 Nov 2022 15:50:46 +0800</lastBuildDate>
+        <pubDate>Mon, 07 Nov 2022 19:27:15 +0800</pubDate>
+        <lastBuildDate>Mon, 07 Nov 2022 19:27:15 +0800</lastBuildDate>
         <item>
             <guid isPermalink="true">http://example.com/2022/11/07/log4j%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%A4%8D%E7%8E%B0/</guid>
             <title>log4j漏洞复现</title>
             <link>http://example.com/2022/11/07/log4j%20%E5%8E%9F%E7%90%86%E5%8F%8A%E5%A4%8D%E7%8E%B0/</link>
-            <pubDate>Mon, 07 Nov 2022 15:50:46 +0800</pubDate>
+            <pubDate>Mon, 07 Nov 2022 19:27:15 +0800</pubDate>
             <description><![CDATA[ &lt;h3 id=&#34;前言&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#前言&#34;&gt;#&lt;/a&gt; 前言：&lt;/h3&gt;
 &lt;p&gt;JNDI (Java Naming and Directory Interface，JAVA 命名和目录接口），它提供一个目录系统，并将服务名称与对象关联起来，从而使得开发人员在开发过程中可以使用名称来访问对象。&lt;br /&gt;
 简单理解：有一个类似于字典的数据源，你可以通过 JNDI 接口，传一个 name 进去，就能获取到对象了&lt;br /&gt;
@@ -68,6 +68,73 @@ JNDI 工具地址：&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3FxXzU2NjA3NzY4L2FydGljbGUvZGV0YWlscy8xMjUxNTQ0MzY=&#34;&gt;https://blog.csdn.net/qq_56607768/article/details/125154436&lt;/span&gt;&lt;/p&gt;
 &lt;/blockquote&gt;
+ ]]></description>
+        </item>
+        <item>
+            <guid isPermalink="true">http://example.com/2022/11/07/hexo%20shoka%20blog%E6%90%AD%E5%BB%BA%E5%B0%8F%E8%AE%B0/</guid>
+            <title>hexo Shoka blog搭建小记</title>
+            <link>http://example.com/2022/11/07/hexo%20shoka%20blog%E6%90%AD%E5%BB%BA%E5%B0%8F%E8%AE%B0/</link>
+            <pubDate>Mon, 07 Nov 2022 19:09:13 +0800</pubDate>
+            <description><![CDATA[ &lt;p&gt;____这篇小记起源于心血来潮，本人突然想自己搭个博客记录记录自己的一些学习过程。过程还算顺利，也比较幸运没碰上什么让人头疼的环境问题，就写一些自己遇到的小坑和实现某些功能的过程吧。&lt;/p&gt;
+&lt;h3 id=&#34;hexo如何识别文章&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#hexo如何识别文章&#34;&gt;#&lt;/a&gt; hexo 如何识别文章&lt;/h3&gt;
+&lt;p&gt;需要保证在 MD 文件的开头加上如下格式的文章头，hexo 才能识别到这是一篇文章，然后文章格式什么的才会比较对 (胡说八道确信点头.jpg)&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;hr /&gt;
+&lt;p&gt;title: first&lt;/p&gt;
+&lt;hr /&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;md文章丢失图片问题&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#md文章丢失图片问题&#34;&gt;#&lt;/a&gt; MD 文章丢失图片问题&lt;/h3&gt;
+&lt;p&gt;第一次尝试上传文章发现文章到 hexo 里会丢失图片 (不知道是不是我的 Markdown 编辑器比较 low)，经好友指点可以借助 CSDN 发博客，然后导出 MD 格式，再进行上传就不会丢失文章中的图片咯！&lt;/p&gt;
+&lt;h3 id=&#34;hexo基础命令&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#hexo基础命令&#34;&gt;#&lt;/a&gt; hexo 基础命令&lt;/h3&gt;
+&lt;p&gt;hexo generate  生成静态文件，可缩写为 hexo -g&lt;/p&gt;
+&lt;p&gt;hexo server 启动服务器，可缩写为 hexo -s&lt;/p&gt;
+&lt;p&gt;hexo clean 清除缓存 (删除 public 文件夹)&lt;/p&gt;
+&lt;p&gt;hexo deploy 将网站部署到服务器上 (会同步 blog 内的 public 文件夹到仓库) 可简写为 hexo d，hexo d -g 部署前预先生成静态文件&lt;br /&gt;
+想要上传文章常规就是先 hexo s 本地检查一下调试效果先，没问题就 hexo g 再 hexo d 套餐然后等待上传完成即可。&lt;br /&gt;
+Tips：&lt;br /&gt;
+①github 服务器可能需要点加载时间，经常显示上传成功但访问到博客还是未更新的状态，耐心等待即可。上传文章反正也是挺玄学一事。&lt;br /&gt;
+②出现 Deploy done：git 就基本安啦！(如果报错可以多 hexo d 两次，本人好几次都是这样解决的，以不变应万变。如果还是报错就具体问题具体分析吧..&lt;br /&gt;
+&lt;img data-src=&#34;https://img-blog.csdnimg.cn/51c9a88b4cbc40c5899699557c4a0d0b.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;/p&gt;
+&lt;h3 id=&#34;更改文章展示图&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#更改文章展示图&#34;&gt;#&lt;/a&gt; 更改文章展示图&lt;/h3&gt;
+&lt;p&gt;在文章.md 的 Front Matter 设置 cover：image path 即可更改文章的展示图（栗子是 (root)/source/assets 下的图片）&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;pre&gt;&lt;code&gt;---
+cover: assets/goodluck.jpg
+# 或者写成
+cover: http://placehold.it/350x150.jpg
+---
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;&lt;img data-src=&#34;https://img-blog.csdnimg.cn/9b3805e8e6c240a18762a2a00f92c7fe.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;设置 fancybox: false ，可以关闭文章页的图片展示功能。&lt;/p&gt;
+&lt;p&gt;&amp;lt;br/&amp;gt;&lt;/p&gt;
+&lt;h3 id=&#34;文章置顶&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#文章置顶&#34;&gt;#&lt;/a&gt; 文章置顶&lt;/h3&gt;
+&lt;p&gt;在文章的 Front Matter 设置 sticky: true ，则该文章将显示在首页最上方的 置顶文章 列。&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;---
+sticky: true
+---
+&lt;/code&gt;&lt;/pre&gt;
+&lt;p&gt;每篇博客的 front matter 都需要加上以下代码，这样才会被认为是一篇博客&lt;/p&gt;
+&lt;pre&gt;&lt;code&gt;---
+title: 文章的标题
+date: 文章发布是年/月/日 时/分/秒
+categories:
+- [博客的分类]
+tags:
+---
+# 这里开始使用Markdown书写博客正文
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;h3 id=&#34;更改点击烟花效果&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#更改点击烟花效果&#34;&gt;#&lt;/a&gt; 更改点击烟花效果&lt;/h3&gt;
+&lt;p&gt;相关配置文件：(root)/themes/shoka/_config.yml&lt;/p&gt;
+&lt;p&gt;找到 fireworks 部分&lt;/p&gt;
+&lt;p&gt;&lt;img data-src=&#34;https://img-blog.csdnimg.cn/8f725d52691e4ff5b40f68c497f26bc0.png#pic_center&#34; alt=&#34;在这里插入图片描述&#34; /&gt;&lt;/p&gt;
+&lt;p&gt;特地查了下 rgba 的 a 代表透明度（顺带提一嘴，多种颜色的点击效果有点吓人，果然是越简单越高级、、）&lt;/p&gt;
+&lt;p&gt;甩个链接里面有各种颜色的 rgb 值&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;&lt;span class=&#34;exturl&#34; data-url=&#34;aHR0cHM6Ly93d3cudG9vbGhlbHBlci5jbi9Db2xvci9SR0JUb0hleA==&#34;&gt;https://www.toolhelper.cn/Color/RGBToHex&lt;/span&gt;&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;h3 id=&#34;这篇小记不出意外会经常更新~只要我不偷懒&#34;&gt;&lt;a class=&#34;anchor&#34; href=&#34;#这篇小记不出意外会经常更新~只要我不偷懒&#34;&gt;#&lt;/a&gt; 这篇小记不出意外会经常更新～(只要我不偷懒..)&lt;/h3&gt;
  ]]></description>
         </item>
         <item>
